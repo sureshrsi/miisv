@@ -1,1 +1,15 @@
 /* Add here all your CSS customizations */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+}
+
+button {
+    cursor: pointer;
+}

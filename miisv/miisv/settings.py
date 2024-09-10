@@ -58,7 +58,7 @@ ROOT_URLCONF = 'miisv.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates/store'), os.path.join(BASE_DIR, 'templates/accounts')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,3 +133,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Directory to store media files
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_REDIRECT_URL = 'home'  # Redirect to this URL after a successful login
+LOGOUT_REDIRECT_URL = 'signin'  # Redirect here after logout

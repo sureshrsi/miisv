@@ -1,4 +1,4 @@
-{% extends "store/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block content %}
 <div role="main" class="main shop py-4">
@@ -8,40 +8,7 @@
 			<div class="col">
 				<div class="featured-boxes">
 					<div class="row">
-						<div class="col-md-6">
-							<div class="featured-box featured-box-primary text-left mt-2">
-								<div class="box-content">
-									<h4 class="color-primary font-weight-semibold text-4 text-uppercase mb-3">I'm a
-										Returning Customer</h4>
-									<form id="frmSignIn" method="post">
-										{% csrf_token %}
-										{{ form.non_field_errors }}
-										<div class="form-row">
-											<div class="form-group col">
-												<label class="font-weight-bold text-dark text-2">Username or E-mail
-													Address</label>
-												{{ form.username.errors }}
-												{{ form.username }}
-											</div>
-										</div>
-										<div class="form-row">
-											<div class="form-group col">
-												<a class="float-right" href="#">(Lost Password?)</a>
-												<label class="font-weight-bold text-dark text-2">Password</label>
-												{{ form.password.errors }}
-												{{ form.password }}
-											</div>
-										</div>
-										<div class="form-row">
-											<div class="form-group col-lg-6">
-												<input type="submit" value="Login" class="btn btn-primary float-right"
-													data-loading-text="Loading...">
-											</div>
-										</div>
-									</form>
-								</div>
-							</div>
-						</div>
+
 						<div class="col-md-6">
 							<div class="featured-box featured-box-primary text-left mt-2">
 								<div class="box-content">
