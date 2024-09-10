@@ -5,6 +5,7 @@ from .forms import SignUpForm, CustomAuthenticationForm, ProfileForm, AddressFor
 from django.contrib.auth.decorators import login_required
 from .models import Address
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
 
 def signup(request):
@@ -24,14 +25,32 @@ def signup(request):
     return render(request, 'accounts/signup.html', {'form': form})
 
 
-def singin(request):
+def signin(request):
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
-        if form.is_valid:
-            form.save(commit=False)
-
+        if form.is_valid():
+            # Access the validated form data
+            username = form.cleaned_data.get('username')  # Corrected line
+            password = form.cleaned_data.get('password')  # Corrected line
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')
+                return redirect('home')  # Adjust the redirect as needed
+            else:
+                messages.error(request, 'Invalid username or password.')
         else:
-            redirect('singin')
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, 'accounts/signin.html', {'form': form})
+
+
+def signout(request):
+    logout(request)
+    messages.success(request, 'You have been successfully logged out..')
+    return redirect('home')
 
 
 @login_required

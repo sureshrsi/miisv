@@ -40,14 +40,14 @@ def productList(request):
     available_brands = Brand.objects.all()
     available_colors = Product.objects.values_list(
         'color', flat=True).distinct()
-    return render(request, 'store/product_listOne.html', {'products': products,
-                                                          'available_brands': available_brands,
-                                                          'available_colors': available_colors,
-                                                          'selected_rating': rating,
-                                                          'selected_brands': brands,
-                                                          'selected_colors': colors,
-                                                          'min_price': min_price,
-                                                          'max_price': max_price, })
+    return render(request, 'store/product_list.html', {'products': products,
+                                                       'available_brands': available_brands,
+                                                       'available_colors': available_colors,
+                                                       'selected_rating': rating,
+                                                       'selected_brands': brands,
+                                                       'selected_colors': colors,
+                                                       'min_price': min_price,
+                                                       'max_price': max_price, })
 
 
 def productDetails(request, slug):
@@ -101,13 +101,14 @@ def remove_from_cart(request, item_id):
 
 
 def update_cart_item(request, item_id):
-    cart_item = get_object_or_404(CartItem, id=item_id)
-    quantity = int(request.POST.get('quantity', 1))
-    cart_item.quantity = max(1, quantity)  # Ensure quantity is at least 1
-    cart_item.save()
-    return redirect('cart_detail')
+    if request.method == 'POST':
+        cart_item = get_object_or_404(CartItem, id=item_id)
+        new_quantity = int(request.POST.get('quantity', 1))
+        cart_item.quantity = new_quantity
+        cart_item.save()
+    return redirect('cart_detail')  # Adjust the redirect as per your setup
 
 
 def cart_detail(request):
     cart = get_cart(request)
-    return render(request, 'cart_detail.html', {'cart': cart})
+    return render(request, 'store/cart_detail.html', {'cart': cart})

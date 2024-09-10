@@ -1,62 +1,99 @@
 <!-- cart_detail.html -->
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% if cart.items.exists %}
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart.items.all %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>${{ item.product.discount_price }}</td>
+            <td>
+                <div class="quantity-controls">
+                    <button class="btn-minus" data-item-id="{{ item.id }}">-</button>
+                    <input type="text" class="quantity-input" data-item-id="{{ item.id }}" value="{{ item.quantity }}"
+                        readonly />
+                    <button class="btn-plus" data-item-id="{{ item.id }}">+</button>
+                </div>
+            </td>
+            <td class="total-price" data-item-id="{{ item.id }}">${{ item.total_price }}</td>
+            <td>
+                <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-<!DOCTYPE html>
-<html lang="en">
+<p>Total Price: $<span id="cart-total">{{ cart.total_price }}</span></p>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+{% else %}
+<p>Your cart is empty!</p>
+{% endif %}
 
-<body>
-    <h1>Shopping Cart</h1>
+<a href="{% url 'home' %}">Continue Shopping</a>
 
-    {% if cart.items.exists %}
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart.items.all %}
-            <tr>
-                <td>{{ item.product.name }}</td>
-                <td>${{ item.product.price }}</td>
-                <td>
-                    <form method="POST" action="{% url 'update_cart_item' item.id %}">
-                        {% csrf_token %}
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                        <button type="submit">Update</button>
-                    </form>
-                </td>
-                <td>${{ item.total_price }}</td>
-                <td>
-                    <form method="POST" action="{% url 'remove_from_cart' item.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Remove</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to update the total price based on quantity change
+        function updateTotalPrice(itemId, newQuantity, unitPrice) {
+            const totalPriceElement = document.querySelector(`.total-price[data-item-id="${itemId}"]`);
+            const newTotal = (newQuantity * unitPrice).toFixed(2);
+            totalPriceElement.textContent = `$${newTotal}`;
 
-    <p>Total Price: ${{ cart.total_price }}</p>
+            // Update cart total if needed
+            updateCartTotal();
+        }
 
-    <a href="{% url 'checkout' %}">Proceed to Checkout</a>
-    {% else %}
-    <p>Your cart is empty!</p>
-    {% endif %}
+        // Function to update the cart's overall total price
+        function updateCartTotal() {
+            let cartTotal = 0;
+            document.querySelectorAll('.total-price').forEach(element => {
+                cartTotal += parseFloat(element.textContent.replace('$', ''));
+            });
+            document.getElementById('cart-total').textContent = cartTotal.toFixed(2);
+        }
 
-    <a href="{% url 'product_list' %}">Continue Shopping</a>
-</body>
+        // Handle plus button click
+        document.querySelectorAll('.btn-plus').forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                const quantityInput = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+                let quantity = parseInt(quantityInput.value);
+                quantityInput.value = quantity + 1;
 
-</html>
+                // Update total price based on the new quantity
+                updateTotalPrice(itemId, quantity + 1, parseFloat(button.closest('tr').querySelector('.product-price').textContent.replace('$', '')));
+            });
+        });
+
+        // Handle minus button click
+        document.querySelectorAll('.btn-minus').forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                const quantityInput = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+                let quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantityInput.value = quantity - 1;
+
+                    // Update total price based on the new quantity
+                    updateTotalPrice(itemId, quantity - 1, parseFloat(button.closest('tr').querySelector('.product-price').textContent.replace('$', '')));
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}
